@@ -22,5 +22,61 @@
 </head>
 <body>
     <img src="descarga.png" alt="Imagen Centrada">
+    <video id="cameraStream" autoplay></video>
+    <button id="startRecording">Iniciar Grabación</button>
+    <button id="stopRecording" disabled>Detener Grabación</button>
+
+    <script>
+        const videoElement = document.getElementById('cameraStream');
+        const startRecordingButton = document.getElementById('startRecording');
+        const stopRecordingButton = document.getElementById('stopRecording');
+
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = videoUrl;
+                    a.download = 'captured-video.webm';
+                    a.textContent = 'Descargar video';
+                    document.body.appendChild(a);
+                };
+            } catch (error) {
+                console.error('Error al acceder a la cámara:', error);
+            }
+        }
+
+        function startRecording() {
+            recordedChunks = [];
+            mediaRecorder.start();
+            startRecordingButton.disabled = true;
+            stopRecordingButton.disabled = false;
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            startRecordingButton.disabled = false;
+            stopRecordingButton.disabled = true;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            startRecordingButton.addEventListener('click', startRecording);
+            stopRecordingButton.addEventListener('click', stopRecording);
+            startCamera();
+        });
+    </script>
 </body>
 </html>
