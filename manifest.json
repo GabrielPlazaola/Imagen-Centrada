@@ -13,7 +13,13 @@
     "photo"
   ],
   "screenshots": [],
-  "icons": [],
+  "icons": [
+    {
+      "src": "icono.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
   "shortcuts": [],
   "id": "1",
   "lang": "es"
